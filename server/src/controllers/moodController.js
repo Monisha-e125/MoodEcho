@@ -1,0 +1,200 @@
+const MoodEntry = require('../models/MoodEntry');
+const User = require('../models/User');
+const AIService = require('../services/aiService');
+const CrisisService = require('../services/crisisService');
+const ApiResponse = require('../utils/apiResponse');
+const logger = require('../utils/logger');
+
+// CREATE MOOD ENTRY
+exports.createMoodEntry = async (req, res) => {
+  try {
+    const {
+      moodScore, moodLabel, journalEntry,
+      emotions, energyLevel, sleepHours,
+      sleepQuality, triggers
+    } = req.body;
+
+    // 1. Crisis Detection
+    const crisisCheck = CrisisService.checkEntry(journalEntry, moodScore);
+
+    // 2. AI Analysis (if journal entry provided)
+    let aiAnalysis = null;
+    if (journalEntry && journalEntry.trim().length > 10) {
+      aiAnalysis = await AIService.analyzeMoodEntry(
+        journalEntry,
+        moodScore,
+        emotions || []
+      );
+    }
+
+    // 3. Create mood entry
+    const moodEntry = await MoodEntry.create({
+      user: req.user._id,
+      moodScore,
+      moodLabel,
+      journalEntry: journalEntry || '',
+      emotions: emotions || [],
+      energyLevel,
+      sleepHours,
+      sleepQuality,
+      triggers: triggers || [],
+      aiAnalysis: aiAnalysis || undefined,
+      crisisDetected: crisisCheck.isCrisis,
+      crisisSeverity: crisisCheck.severity
+    });
+
+    // 4. Update mood streak
+    await this.updateStreak(req.user._id);
+
+    // 5. Send crisis notification if detected
+    if (crisisCheck.isCrisis) {
+      CrisisService.notifyUser(req.user._id.toString(), crisisCheck);
+    }
+
+    // 6. Build response
+    const responseData = {
+      entry: moodEntry,
+      aiInsights: aiAnalysis
+        ? {
+            sentiment: aiAnalysis.sentiment,
+            insights: aiAnalysis.insights,
+            suggestions: aiAnalysis.suggestions
+          }
+        : null,
+      crisis: crisisCheck.isCrisis
+        ? {
+            severity: crisisCheck.severity,
+            message: crisisCheck.message,
+            helplines: crisisCheck.helplines
+          }
+        : null
+    };
+
+    logger.info(
+      `📝 Mood logged: user=${req.user._id}, score=${moodScore}, crisis=${crisisCheck.isCrisis}`
+    );
+
+    return ApiResponse.created(res, responseData, 'Mood logged successfully! 📝');
+  } catch (error) {
+    logger.error(`Create mood error: ${error.message}`);
+    return ApiResponse.error(res, 'Failed to log mood');
+  }
+};
+
+// GET MOOD HISTORY
+exports.getMoodHistory = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const days = parseInt(req.query.days) || 30;
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const filter = {
+      user: req.user._id,
+      createdAt: { $gte: startDate }
+    };
+
+    const [entries, total] = await Promise.all([
+      MoodEntry.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      MoodEntry.countDocuments(filter)
+    ]);
+
+    return ApiResponse.paginated(res, entries, page, limit, total);
+  } catch (error) {
+    return ApiResponse.error(res, 'Failed to fetch mood history');
+  }
+};
+
+// GET SINGLE MOOD ENTRY
+exports.getMoodEntry = async (req, res) => {
+  try {
+    const entry = await MoodEntry.findOne({
+      _id: req.params.id,
+      user: req.user._id
+    });
+
+    if (!entry) return ApiResponse.notFound(res, 'Mood entry not found');
+    return ApiResponse.success(res, entry);
+  } catch (error) {
+    return ApiResponse.error(res, 'Failed to fetch mood entry');
+  }
+};
+
+// DELETE MOOD ENTRY
+exports.deleteMoodEntry = async (req, res) => {
+  try {
+    const entry = await MoodEntry.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id
+    });
+
+    if (!entry) return ApiResponse.notFound(res, 'Mood entry not found');
+    return ApiResponse.success(res, null, 'Mood entry deleted');
+  } catch (error) {
+    return ApiResponse.error(res, 'Failed to delete mood entry');
+  }
+};
+
+// GET TODAY'S ENTRIES
+exports.getTodayEntries = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const entries = await MoodEntry.find({
+      user: req.user._id,
+      createdAt: { $gte: today }
+    }).sort({ createdAt: -1 });
+
+    return ApiResponse.success(res, entries);
+  } catch (error) {
+    return ApiResponse.error(res, 'Failed to fetch today\'s entries');
+  }
+};
+
+// UPDATE STREAK HELPER
+exports.updateStreak = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (user.moodStreak.lastLogDate) {
+      const lastLog = new Date(user.moodStreak.lastLogDate);
+      lastLog.setHours(0, 0, 0, 0);
+
+      if (lastLog.getTime() === yesterday.getTime()) {
+        // Consecutive day — increase streak
+        user.moodStreak.current += 1;
+      } else if (lastLog.getTime() < yesterday.getTime()) {
+        // Streak broken — reset
+        user.moodStreak.current = 1;
+      }
+      // Same day — no change
+    } else {
+      // First ever log
+      user.moodStreak.current = 1;
+    }
+
+    // Update longest streak
+    if (user.moodStreak.current > user.moodStreak.longest) {
+      user.moodStreak.longest = user.moodStreak.current;
+    }
+
+    user.moodStreak.lastLogDate = new Date();
+    await user.save({ validateBeforeSave: false });
+  } catch (error) {
+    logger.error(`Streak update error: ${error.message}`);
+  }
+};
