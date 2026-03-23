@@ -58,22 +58,16 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
-
-
-// Hash password
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+// ✅ FIXED — No next() needed with async
+UserSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
-// Compare password
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Generate access token
 UserSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     { id: this._id, name: this.name, email: this.email },
@@ -82,7 +76,6 @@ UserSchema.methods.generateAccessToken = function () {
   );
 };
 
-// Generate refresh token
 UserSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     { id: this._id },
@@ -91,7 +84,6 @@ UserSchema.methods.generateRefreshToken = function () {
   );
 };
 
-// Safe object (no sensitive fields)
 UserSchema.methods.toSafeObject = function () {
   const obj = this.toObject();
   delete obj.password;

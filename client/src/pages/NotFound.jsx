@@ -3,13 +3,26 @@ import { Home } from 'lucide-react';
 import Button from '../components/common/Button';
 
 const NotFound = () => (
-  <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
-    <div className="text-center">
-      <span className="text-6xl mb-4 block">🔍</span>
-      <h1 className="text-4xl font-bold text-white mb-2">404</h1>
-      <p className="text-dark-400 mb-6">Page not found</p>
-      <Link to="/">
-        <Button><Home className="w-4 h-4" /> Go Home</Button>
+  <div
+    style={{
+      minHeight: '100vh',
+      backgroundColor: '#020617',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+    }}
+  >
+    <div style={{ textAlign: 'center' }}>
+      <span style={{ fontSize: '64px', display: 'block', marginBottom: '16px' }}>🔍</span>
+      <h1 style={{ fontSize: '48px', fontWeight: '800', color: '#f1f5f9' }}>404</h1>
+      <p style={{ color: '#64748b', fontSize: '16px', marginTop: '8px', marginBottom: '28px' }}>
+        Page not found
+      </p>
+      <Link to="/" style={{ textDecoration: 'none' }}>
+        <Button size="lg">
+          <Home size={16} /> Go Home
+        </Button>
       </Link>
     </div>
   </div>

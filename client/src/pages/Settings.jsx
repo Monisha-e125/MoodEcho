@@ -8,6 +8,13 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
 
+const cardStyle = {
+  backgroundColor: '#0f172a',
+  border: '1px solid #1e293b',
+  borderRadius: '20px',
+  padding: '28px',
+};
+
 const Settings = () => {
   const { user } = useSelector((s) => s.auth);
   const dispatch = useDispatch();
@@ -22,18 +29,14 @@ const Settings = () => {
       const res = await authService.updateProfile({ name, bio });
       dispatch(updateUser(res.data.data));
       toast.success('Profile updated!');
-    } catch {
-      toast.error('Failed to update');
-    }
+    } catch { toast.error('Failed to update'); }
     setSaving(false);
   };
 
   const exportData = async () => {
     try {
       const res = await authService.exportData();
-      const blob = new Blob([JSON.stringify(res.data, null, 2)], {
-        type: 'application/json'
-      });
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -41,9 +44,7 @@ const Settings = () => {
       a.click();
       URL.revokeObjectURL(url);
       toast.success('Data exported!');
-    } catch {
-      toast.error('Export failed');
-    }
+    } catch { toast.error('Export failed'); }
   };
 
   const deleteAccount = async () => {
@@ -51,83 +52,126 @@ const Settings = () => {
       await authService.deleteAccount();
       localStorage.clear();
       window.location.href = '/';
-    } catch {
-      toast.error('Delete failed');
-    }
+    } catch { toast.error('Delete failed'); }
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white">Settings</h1>
+    <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f1f5f9' }}>Settings</h1>
 
       {/* Profile */}
-      <div className="bg-dark-900 border border-dark-800 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <User className="w-5 h-5 text-primary-400" /> Profile
+      <div style={cardStyle}>
+        <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#f1f5f9', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <User size={20} style={{ color: '#818cf8' }} /> Profile
         </h2>
-        <div className="space-y-4">
-          <Input
-            label="Name" name="name" value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <div>
-            <label className="block text-sm font-medium text-dark-300 mb-1.5">Bio</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <Input label="Name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '600', color: '#94a3b8' }}>Bio</label>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               maxLength={200}
               rows={3}
-              className="w-full bg-dark-800 border border-dark-700 rounded-xl px-4 py-2.5 text-dark-100 placeholder-dark-500 resize-none focus:outline-none focus:border-primary-500 transition-colors"
               placeholder="Tell us about yourself..."
+              style={{
+                width: '100%',
+                backgroundColor: '#0f172a',
+                border: '1.5px solid #334155',
+                borderRadius: '12px',
+                padding: '14px 16px',
+                color: '#e2e8f0',
+                fontSize: '14px',
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                lineHeight: '1.6',
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#6366f1'; }}
+              onBlur={(e) => { e.target.style.borderColor = '#334155'; }}
             />
           </div>
-          <Button onClick={saveProfile} isLoading={saving}>
-            Save Changes
-          </Button>
+          <Button onClick={saveProfile} isLoading={saving}>Save Changes</Button>
         </div>
       </div>
 
       {/* Data & Privacy */}
-      <div className="bg-dark-900 border border-dark-800 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-green-400" /> Data & Privacy
+      <div style={cardStyle}>
+        <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#f1f5f9', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Shield size={20} style={{ color: '#34d399' }} /> Data & Privacy
         </h2>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-dark-800 rounded-xl">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#1e293b',
+              borderRadius: '14px',
+              padding: '18px 20px',
+              border: '1px solid #334155',
+            }}
+          >
             <div>
-              <p className="text-white font-medium">Export Your Data</p>
-              <p className="text-dark-500 text-sm">Download all your mood data as JSON</p>
+              <p style={{ color: '#f1f5f9', fontWeight: '600', fontSize: '14px' }}>Export Your Data</p>
+              <p style={{ color: '#64748b', fontSize: '13px', marginTop: '4px' }}>Download all mood data as JSON</p>
             </div>
             <Button variant="secondary" size="sm" onClick={exportData}>
-              <Download className="w-4 h-4" /> Export
+              <Download size={14} /> Export
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-red-500/5 border border-red-500/20 rounded-xl">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: 'rgba(239,68,68,0.05)',
+              borderRadius: '14px',
+              padding: '18px 20px',
+              border: '1px solid rgba(239,68,68,0.15)',
+            }}
+          >
             <div>
-              <p className="text-red-400 font-medium">Delete Account</p>
-              <p className="text-dark-500 text-sm">Permanently delete all data</p>
+              <p style={{ color: '#f87171', fontWeight: '600', fontSize: '14px' }}>Delete Account</p>
+              <p style={{ color: '#64748b', fontSize: '13px', marginTop: '4px' }}>Permanently delete all data</p>
             </div>
             <Button variant="danger" size="sm" onClick={() => setShowDelete(true)}>
-              <Trash2 className="w-4 h-4" /> Delete
+              <Trash2 size={14} /> Delete
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Delete Confirmation */}
-      <Modal
-        isOpen={showDelete}
-        onClose={() => setShowDelete(false)}
-        title="⚠️ Delete Account"
-      >
-        <div className="space-y-4">
-          <p className="text-dark-300">
-            This will <strong className="text-red-400">permanently delete</strong> your account
+      {/* Account Info */}
+      <div style={cardStyle}>
+        <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#64748b', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Account Info
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {[
+            ['Email', user?.email],
+            ['Member since', user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'],
+            ['Current streak', `🔥 ${user?.moodStreak?.current || 0} days`],
+            ['Longest streak', `🏆 ${user?.moodStreak?.longest || 0} days`],
+          ].map(([label, value]) => (
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#64748b', fontSize: '14px' }}>{label}</span>
+              <span style={{ color: '#cbd5e1', fontSize: '14px', fontWeight: '500' }}>{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Delete Modal */}
+      <Modal isOpen={showDelete} onClose={() => setShowDelete(false)} title="⚠️ Delete Account">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <p style={{ color: '#cbd5e1', fontSize: '14px', lineHeight: '1.6' }}>
+            This will <strong style={{ color: '#f87171' }}>permanently delete</strong> your account
             and all associated data. This action cannot be undone.
           </p>
-          <div className="flex gap-3">
+          <div style={{ display: 'flex', gap: '12px' }}>
             <Button variant="secondary" fullWidth onClick={() => setShowDelete(false)}>
               Cancel
             </Button>
@@ -137,31 +181,6 @@ const Settings = () => {
           </div>
         </div>
       </Modal>
-
-      {/* Account Info */}
-      <div className="bg-dark-900 border border-dark-800 rounded-2xl p-6">
-        <h2 className="text-sm font-semibold text-dark-500 mb-3">Account Info</h2>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-dark-500">Email</span>
-            <span className="text-dark-300">{user?.email}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-dark-500">Member since</span>
-            <span className="text-dark-300">
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-dark-500">Current streak</span>
-            <span className="text-dark-300">🔥 {user?.moodStreak?.current || 0} days</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-dark-500">Longest streak</span>
-            <span className="text-dark-300">🏆 {user?.moodStreak?.longest || 0} days</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

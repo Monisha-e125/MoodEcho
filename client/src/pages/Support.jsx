@@ -22,7 +22,6 @@ const Support = () => {
 
   useEffect(() => {
     if (!activeRoom) return;
-
     supportService.getMessages(activeRoom._id)
       .then((res) => setMessages(res.data.data))
       .catch(() => {});
@@ -33,7 +32,6 @@ const Support = () => {
         setMessages((prev) => [...prev, msg]);
       });
     }
-
     return () => {
       if (socket) {
         socket.emit('leave-room', activeRoom._id);
@@ -49,45 +47,69 @@ const Support = () => {
   const sendMessage = (e) => {
     e.preventDefault();
     if (!message.trim() || !activeRoom) return;
-
     if (socket) {
-      socket.emit('send-message', {
-        roomId: activeRoom._id,
-        content: message.trim()
-      });
+      socket.emit('send-message', { roomId: activeRoom._id, content: message.trim() });
     }
-
     supportService.sendMessage(activeRoom._id, message.trim()).catch(() => {});
     setMessage('');
   };
 
-  // Room list view
+  // Room List
   if (!activeRoom) {
     return (
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <div>
-          <h1 className="text-2xl font-bold text-white">Peer Support</h1>
-          <p className="text-dark-400 mt-1">Join anonymous support rooms</p>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#f1f5f9' }}>Peer Support</h1>
+          <p style={{ color: '#64748b', marginTop: '6px', fontSize: '15px' }}>Join anonymous support rooms</p>
         </div>
 
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-          <p className="text-amber-300 text-sm">
+        <div
+          style={{
+            backgroundColor: 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.2)',
+            borderRadius: '14px',
+            padding: '16px 20px',
+          }}
+        >
+          <p style={{ color: '#fcd34d', fontSize: '14px', fontWeight: '500' }}>
             💛 All messages are anonymous. Be kind and supportive. This is NOT a substitute for professional help.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '16px',
+          }}
+        >
           {rooms.map((room) => (
             <button
               key={room._id}
               onClick={() => setActiveRoom(room)}
-              className="bg-dark-900 border border-dark-800 hover:border-primary-500/30 rounded-2xl p-5 text-left transition-colors"
+              style={{
+                backgroundColor: '#0f172a',
+                border: '1px solid #1e293b',
+                borderRadius: '20px',
+                padding: '28px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#1e293b';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <h3 className="text-white font-semibold text-lg">{room.name}</h3>
-              <p className="text-dark-400 text-sm mt-1">{room.description}</p>
-              <div className="flex items-center gap-2 mt-3 text-dark-500 text-xs">
-                <Users className="w-3.5 h-3.5" />
-                {room.activeUsers || 0} active
+              <h3 style={{ color: '#f1f5f9', fontWeight: '700', fontSize: '18px' }}>{room.name}</h3>
+              <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '8px', lineHeight: '1.5' }}>{room.description}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px' }}>
+                <Users size={14} style={{ color: '#64748b' }} />
+                <span style={{ fontSize: '12px', color: '#64748b' }}>{room.activeUsers || 0} active</span>
               </div>
             </button>
           ))}
@@ -96,42 +118,53 @@ const Support = () => {
     );
   }
 
-  // Chat view
+  // Chat View
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      {/* Chat Header */}
-      <div className="flex items-center gap-3 pb-4 border-b border-dark-800">
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 140px)' }}>
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid #1e293b',
+          marginBottom: '16px',
+        }}
+      >
         <button
           onClick={() => setActiveRoom(null)}
-          className="p-2 rounded-lg hover:bg-dark-800 text-dark-400"
+          style={{ padding: '8px', borderRadius: '10px', border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', display: 'flex' }}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft size={20} />
         </button>
         <div>
-          <h2 className="text-white font-semibold">{activeRoom.name}</h2>
-          <p className="text-dark-500 text-xs">{activeRoom.description}</p>
+          <h2 style={{ color: '#f1f5f9', fontWeight: '700', fontSize: '16px' }}>{activeRoom.name}</h2>
+          <p style={{ color: '#64748b', fontSize: '12px' }}>{activeRoom.description}</p>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-3">
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {messages.map((msg, i) => {
           const isMe = msg.sender?._id === user?._id || msg.userId === user?._id;
           return (
-            <div key={msg._id || i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+            <div key={msg._id || i} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl ${
-                  isMe
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-dark-800 text-dark-200'
-                }`}
+                style={{
+                  maxWidth: '340px',
+                  padding: '12px 16px',
+                  borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                  backgroundColor: isMe ? '#4f46e5' : '#1e293b',
+                  color: isMe ? '#ffffff' : '#e2e8f0',
+                }}
               >
                 {!isMe && (
-                  <p className="text-xs text-dark-500 mb-1">
+                  <p style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px', fontWeight: '600' }}>
                     {msg.isAnonymous ? 'Anonymous' : msg.sender?.name || msg.userName}
                   </p>
                 )}
-                <p className="text-sm">{msg.content}</p>
+                <p style={{ fontSize: '14px', lineHeight: '1.5', wordBreak: 'break-word' }}>{msg.content}</p>
               </div>
             </div>
           );
@@ -140,16 +173,37 @@ const Support = () => {
       </div>
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="flex gap-2 pt-3 border-t border-dark-800">
+      <form
+        onSubmit={sendMessage}
+        style={{
+          display: 'flex',
+          gap: '10px',
+          paddingTop: '16px',
+          borderTop: '1px solid #1e293b',
+          marginTop: '16px',
+        }}
+      >
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a supportive message..."
           maxLength={1000}
-          className="flex-1 bg-dark-800 border border-dark-700 rounded-xl px-4 py-2.5 text-dark-100 placeholder-dark-500 focus:outline-none focus:border-primary-500 transition-colors"
+          style={{
+            flex: 1,
+            height: '44px',
+            backgroundColor: '#0f172a',
+            border: '1.5px solid #334155',
+            borderRadius: '12px',
+            padding: '0 16px',
+            color: '#e2e8f0',
+            fontSize: '14px',
+            outline: 'none',
+          }}
+          onFocus={(e) => { e.target.style.borderColor = '#6366f1'; }}
+          onBlur={(e) => { e.target.style.borderColor = '#334155'; }}
         />
         <Button type="submit" disabled={!message.trim()}>
-          <Send className="w-4 h-4" />
+          <Send size={16} />
         </Button>
       </form>
     </div>

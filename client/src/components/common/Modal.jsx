@@ -1,38 +1,90 @@
 import { X } from 'lucide-react';
 
-const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
+const Modal = ({ isOpen, onClose, title, children, maxWidth = '480px' }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+      }}
+    >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(4px)',
+        }}
       />
 
       {/* Modal */}
       <div
-        className={`
-          relative ${maxWidth} w-full bg-dark-800 border border-dark-700
-          rounded-2xl shadow-2xl animate-slide-up
-        `}
+        className="animate-slide-up"
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth,
+          backgroundColor: '#1e293b',
+          border: '1px solid #334155',
+          borderRadius: '16px',
+          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden',
+        }}
       >
-        {/* Header */}
         {title && (
-          <div className="flex items-center justify-between p-5 border-b border-dark-700">
-            <h3 className="text-lg font-semibold text-dark-100">{title}</h3>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '20px 24px',
+              borderBottom: '1px solid #334155',
+            }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                fontWeight: '700',
+                color: '#f1f5f9',
+              }}
+            >
+              {title}
+            </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-dark-200 transition-colors"
+              style={{
+                padding: '6px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                color: '#94a3b8',
+                display: 'flex',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#334155';
+                e.target.style.color = '#f1f5f9';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.color = '#94a3b8';
+              }}
             >
-              <X className="w-5 h-5" />
+              <X size={18} />
             </button>
           </div>
         )}
-
-        {/* Body */}
-        <div className="p-5">{children}</div>
+        <div style={{ padding: '24px' }}>{children}</div>
       </div>
     </div>
   );

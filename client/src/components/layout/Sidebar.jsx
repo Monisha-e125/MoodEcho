@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../store/slices/uiSlice';
 import {
   LayoutDashboard, BookOpen, BarChart3, Sparkles,
-  MessageCircle, Settings, ChevronLeft, Heart, Phone
+  MessageCircle, Settings, ChevronLeft, Phone
 } from 'lucide-react';
 
 const navItems = [
@@ -12,7 +12,7 @@ const navItems = [
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/wellness', icon: Sparkles, label: 'Wellness' },
   { to: '/support', icon: MessageCircle, label: 'Support' },
-  { to: '/settings', icon: Settings, label: 'Settings' }
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 const Sidebar = () => {
@@ -24,76 +24,134 @@ const Sidebar = () => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => dispatch(toggleSidebar())}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            zIndex: 40,
+          }}
+          className="lg:hidden"
         />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`
-          fixed top-0 left-0 h-full bg-dark-900 border-r border-dark-800
-          z-50 transition-all duration-300
-          ${sidebarOpen ? 'w-64' : 'w-20'}
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          height: '100%',
+          width: sidebarOpen ? '256px' : '72px',
+          backgroundColor: '#0f172a',
+          borderRight: '1px solid #1e293b',
+          zIndex: 50,
+          transition: 'all 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-dark-800">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center">
-              <span className="text-lg">🧠</span>
+        <div
+          style={{
+            height: '64px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            borderBottom: '1px solid #1e293b',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '18px',
+              }}
+            >
+              🧠
             </div>
             {sidebarOpen && (
-              <span className="text-lg font-bold text-white">
-                Mood<span className="text-primary-400">Echo</span>
+              <span style={{ fontSize: '17px', fontWeight: '800', color: '#f1f5f9' }}>
+                Mood<span style={{ color: '#818cf8' }}>Echo</span>
               </span>
             )}
           </div>
-          <button
-            onClick={() => dispatch(toggleSidebar())}
-            className="p-1.5 rounded-lg hover:bg-dark-800 text-dark-400 hidden lg:block"
-          >
-            <ChevronLeft
-              className={`w-4 h-4 transition-transform ${!sidebarOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
+          {sidebarOpen && (
+            <button
+              onClick={() => dispatch(toggleSidebar())}
+              style={{
+                padding: '6px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                color: '#64748b',
+                display: 'flex',
+              }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+          )}
         </div>
 
-        {/* Navigation */}
-        <nav className="p-3 space-y-1 mt-2">
+        {/* Nav */}
+        <nav style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                ${isActive
-                  ? 'bg-primary-600/15 text-primary-400 border border-primary-500/20'
-                  : 'text-dark-400 hover:bg-dark-800 hover:text-dark-200'
-                }
-                ${!sidebarOpen ? 'justify-center' : ''}`
-              }
               onClick={() => {
                 if (window.innerWidth < 1024) dispatch(toggleSidebar());
               }}
+              style={({ isActive }) => ({
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: sidebarOpen ? '10px 14px' : '10px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: isActive ? '600' : '500',
+                color: isActive ? '#818cf8' : '#94a3b8',
+                backgroundColor: isActive ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+                border: isActive ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid transparent',
+                justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                transition: 'all 0.2s ease',
+              })}
             >
-              <Icon className="w-5 h-5 shrink-0" />
-              {sidebarOpen && <span className="text-sm font-medium">{label}</span>}
+              <Icon size={20} />
+              {sidebarOpen && label}
             </NavLink>
           ))}
         </nav>
 
-        {/* Crisis Help Link */}
+        {/* Crisis Link */}
         {sidebarOpen && (
-          <div className="absolute bottom-4 left-3 right-3">
+          <div style={{ padding: '12px' }}>
             <NavLink
               to="/crisis-help"
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#f87171',
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.15)',
+              }}
             >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-medium">Crisis Helplines</span>
-              <Heart className="w-3.5 h-3.5 ml-auto" />
+              <Phone size={16} />
+              Crisis Helplines
             </NavLink>
           </div>
         )}

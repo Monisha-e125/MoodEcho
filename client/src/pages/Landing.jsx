@@ -1,87 +1,219 @@
 import { Link } from 'react-router-dom';
-import { Brain, Heart, BarChart3, Shield, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  Brain, Heart, BarChart3, Shield, ArrowRight,
+  Sparkles, MessageCircle, Phone
+} from 'lucide-react';
 import Button from '../components/common/Button';
 
 const features = [
-  { icon: Brain, title: 'AI Mood Analysis', desc: 'Gemini AI analyzes your journal entries for deep emotional insights.' },
-  { icon: Heart, title: 'Crisis Safety', desc: 'Automatic crisis detection with instant helpline access.' },
-  { icon: BarChart3, title: 'Smart Analytics', desc: 'Discover mood patterns, triggers, and weekly trends.' },
-  { icon: Sparkles, title: 'Guided Wellness', desc: 'Breathing exercises, gratitude journaling, and grounding techniques.' },
-  { icon: Shield, title: 'Privacy First', desc: 'Your data stays yours. Export or delete anytime.' }
+  {
+    icon: Brain,
+    title: 'AI Mood Analysis',
+    desc: 'Gemini AI analyzes your journal entries for deep emotional insights and personalized patterns.',
+    color: '#818cf8',
+  },
+  {
+    icon: Heart,
+    title: 'Crisis Safety',
+    desc: 'Automatic crisis detection with instant helpline access. Your safety comes first.',
+    color: '#f472b6',
+  },
+  {
+    icon: BarChart3,
+    title: 'Smart Analytics',
+    desc: 'Discover mood patterns, triggers, weekday trends, and get weekly AI-generated reports.',
+    color: '#34d399',
+  },
+  {
+    icon: Sparkles,
+    title: 'Guided Wellness',
+    desc: 'Breathing exercises, gratitude journaling, and 5-4-3-2-1 grounding techniques.',
+    color: '#fbbf24',
+  },
+  {
+    icon: MessageCircle,
+    title: 'Peer Support',
+    desc: 'Anonymous support rooms with real-time chat. Connect with people who understand.',
+    color: '#60a5fa',
+  },
+  {
+    icon: Shield,
+    title: 'Privacy First',
+    desc: 'Your data stays yours. Export or delete everything anytime. GDPR compliant.',
+    color: '#a78bfa',
+  },
 ];
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-dark-950">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🧠</span>
-          <span className="text-xl font-bold text-white">
-            Mood<span className="text-primary-400">Echo</span>
+    <div style={{ minHeight: '100vh', backgroundColor: '#020617' }}>
+      {/* Navbar */}
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '16px 24px',
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '28px' }}>🧠</span>
+          <span style={{ fontSize: '22px', fontWeight: '800', color: '#f1f5f9' }}>
+            Mood<span style={{ color: '#818cf8' }}>Echo</span>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Link to="/crisis-help">
+            <Button variant="ghost" size="sm">
+              <Phone size={14} /> Crisis Help
+            </Button>
+          </Link>
           <Link to="/login">
-            <Button variant="ghost">Login</Button>
+            <Button variant="ghost" size="sm">Login</Button>
           </Link>
           <Link to="/register">
-            <Button>Get Started</Button>
+            <Button size="sm">Get Started</Button>
           </Link>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto text-center px-6 pt-20 pb-16">
-        <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 px-4 py-2 rounded-full mb-6">
-          <Sparkles className="w-4 h-4 text-primary-400" />
-          <span className="text-sm text-primary-300">AI-Powered Mental Wellness</span>
+      <section
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          textAlign: 'center',
+          padding: '80px 24px 60px',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(99, 102, 241, 0.1)',
+            border: '1px solid rgba(99, 102, 241, 0.2)',
+            padding: '8px 18px',
+            borderRadius: '100px',
+            marginBottom: '28px',
+          }}
+        >
+          <Sparkles size={15} style={{ color: '#818cf8' }} />
+          <span style={{ fontSize: '13px', color: '#a5b4fc', fontWeight: '500' }}>
+            AI-Powered Mental Wellness
+          </span>
         </div>
 
-        <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+        <h1
+          style={{
+            fontSize: 'clamp(36px, 5vw, 56px)',
+            fontWeight: '800',
+            color: '#f1f5f9',
+            lineHeight: '1.15',
+            marginBottom: '20px',
+          }}
+        >
           Understand your{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">
-            emotions
-          </span>
-          <br />with AI-powered insights
+          <span className="gradient-text">emotions</span>
+          <br />
+          with AI-powered insights
         </h1>
 
-        <p className="text-lg text-dark-400 mb-8 max-w-2xl mx-auto">
+        <p
+          style={{
+            fontSize: '17px',
+            color: '#94a3b8',
+            lineHeight: '1.7',
+            maxWidth: '600px',
+            margin: '0 auto 32px',
+          }}
+        >
           Track your mood through journaling, get AI-powered sentiment analysis,
           discover emotional patterns, and access guided wellness exercises — all in one safe space.
         </p>
 
-        <div className="flex items-center justify-center gap-4">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <Link to="/register">
             <Button size="lg">
-              Start Free <ArrowRight className="w-4 h-4" />
+              Start Free <ArrowRight size={16} />
             </Button>
           </Link>
           <Link to="/crisis-help">
             <Button variant="secondary" size="lg">
-              <Heart className="w-4 h-4" /> Crisis Help
+              <Heart size={16} /> Crisis Help
             </Button>
           </Link>
         </div>
 
-        <p className="mt-4 text-xs text-dark-600">
+        <p style={{ marginTop: '16px', fontSize: '12px', color: '#475569' }}>
           ⚠️ This is a wellness tool, not a substitute for professional mental health care.
         </p>
       </section>
 
       {/* Features */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon: Icon, title, desc }, i) => (
+      <section
+        style={{
+          maxWidth: '1100px',
+          margin: '0 auto',
+          padding: '0 24px 80px',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '16px',
+          }}
+        >
+          {features.map(({ icon: Icon, title, desc, color }, i) => (
             <div
               key={i}
-              className="bg-dark-900 border border-dark-800 rounded-2xl p-6 hover:border-primary-500/30 transition-colors"
+              style={{
+                backgroundColor: '#0f172a',
+                border: '1px solid #1e293b',
+                borderRadius: '16px',
+                padding: '28px',
+                transition: 'all 0.3s ease',
+                cursor: 'default',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = color + '40';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#1e293b';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <div className="w-10 h-10 bg-primary-500/15 rounded-xl flex items-center justify-center mb-4">
-                <Icon className="w-5 h-5 text-primary-400" />
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  backgroundColor: color + '15',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px',
+                }}
+              >
+                <Icon size={20} style={{ color }} />
               </div>
-              <h3 className="text-white font-semibold mb-2">{title}</h3>
-              <p className="text-dark-400 text-sm">{desc}</p>
+              <h3
+                style={{
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: '#f1f5f9',
+                  marginBottom: '8px',
+                }}
+              >
+                {title}
+              </h3>
+              <p style={{ fontSize: '14px', color: '#94a3b8', lineHeight: '1.6' }}>
+                {desc}
+              </p>
             </div>
           ))}
         </div>

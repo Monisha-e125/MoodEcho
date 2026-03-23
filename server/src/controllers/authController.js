@@ -13,10 +13,16 @@ const getCookieOptions = (maxAge) => {
   };
 };
 
-// REGISTER
+// ═══ REGISTER ═══
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    logger.info(`📝 Register attempt: ${email}`);
+
+    if (!name || !email || !password) {
+      return ApiResponse.badRequest(res, 'Name, email, and password are required');
+    }
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -29,8 +35,18 @@ exports.register = async (req, res) => {
       password
     });
 
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    logger.info(`✅ User created: ${email}`);
+
+    // Generate tokens
+    let accessToken, refreshToken;
+    try {
+      accessToken = user.generateAccessToken();
+      refreshToken = user.generateRefreshToken();
+    } catch (tokenErr) {
+      logger.error(`❌ Token error: ${tokenErr.message}`);
+      await User.findByIdAndDelete(user._id);
+      return ApiResponse.error(res, 'Server configuration error — JWT secrets missing');
+    }
 
     user.refreshToken = refreshToken;
     user.lastLogin = new Date();
@@ -39,7 +55,7 @@ exports.register = async (req, res) => {
     res.cookie('accessToken', accessToken, getCookieOptions(7 * 24 * 60 * 60 * 1000));
     res.cookie('refreshToken', refreshToken, getCookieOptions(30 * 24 * 60 * 60 * 1000));
 
-    logger.info(`✅ New user registered: ${email}`);
+    logger.info(`✅ Register complete: ${email}`);
 
     return ApiResponse.created(res, {
       user: user.toSafeObject(),
@@ -47,22 +63,35 @@ exports.register = async (req, res) => {
       refreshToken
     }, 'Welcome to MoodEcho! 🎉');
   } catch (error) {
-    logger.error(`Registration error: ${error.message}`);
+    logger.error(`❌ Register error: ${error.message}`);
+    logger.error(`Stack: ${error.stack}`);
+
     if (error.code === 11000) {
       return ApiResponse.conflict(res, 'Email already registered');
     }
-    return ApiResponse.error(res, 'Registration failed');
+    if (error.name === 'ValidationError') {
+      const msgs = Object.values(error.errors).map((e) => e.message);
+      return ApiResponse.badRequest(res, msgs.join('. '));
+    }
+    return ApiResponse.error(res, 'Registration failed. Please try again.');
   }
 };
 
-// LOGIN
+// ═══ LOGIN ═══
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    logger.info(`🔐 Login attempt: ${email}`);
+
+    if (!email || !password) {
+      return ApiResponse.badRequest(res, 'Email and password are required');
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user) {
+      logger.warn(`❌ Login failed — not found: ${email}`);
       return ApiResponse.unauthorized(res, 'Invalid email or password');
     }
 
@@ -70,13 +99,28 @@ exports.login = async (req, res) => {
       return ApiResponse.unauthorized(res, 'Account deactivated');
     }
 
-    const isValid = await user.comparePassword(password);
+    let isValid;
+    try {
+      isValid = await user.comparePassword(password);
+    } catch (compareErr) {
+      logger.error(`❌ Password compare error: ${compareErr.message}`);
+      return ApiResponse.error(res, 'Login failed. Please try again.');
+    }
+
     if (!isValid) {
+      logger.warn(`❌ Login failed — wrong password: ${email}`);
       return ApiResponse.unauthorized(res, 'Invalid email or password');
     }
 
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    // Generate tokens
+    let accessToken, refreshToken;
+    try {
+      accessToken = user.generateAccessToken();
+      refreshToken = user.generateRefreshToken();
+    } catch (tokenErr) {
+      logger.error(`❌ Token error: ${tokenErr.message}`);
+      return ApiResponse.error(res, 'Server configuration error — JWT secrets missing');
+    }
 
     user.refreshToken = refreshToken;
     user.lastLogin = new Date();
@@ -85,7 +129,7 @@ exports.login = async (req, res) => {
     res.cookie('accessToken', accessToken, getCookieOptions(7 * 24 * 60 * 60 * 1000));
     res.cookie('refreshToken', refreshToken, getCookieOptions(30 * 24 * 60 * 60 * 1000));
 
-    logger.info(`✅ User logged in: ${email}`);
+    logger.info(`✅ Login successful: ${email}`);
 
     return ApiResponse.success(res, {
       user: user.toSafeObject(),
@@ -93,12 +137,13 @@ exports.login = async (req, res) => {
       refreshToken
     }, 'Welcome back! 👋');
   } catch (error) {
-    logger.error(`Login error: ${error.message}`);
-    return ApiResponse.error(res, 'Login failed');
+    logger.error(`❌ Login error: ${error.message}`);
+    logger.error(`Stack: ${error.stack}`);
+    return ApiResponse.error(res, 'Login failed. Please try again.');
   }
 };
 
-// LOGOUT
+// ═══ LOGOUT ═══
 exports.logout = async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.user._id, { refreshToken: '' });
@@ -110,7 +155,7 @@ exports.logout = async (req, res) => {
   }
 };
 
-// GET ME
+// ═══ GET ME ═══
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -121,7 +166,7 @@ exports.getMe = async (req, res) => {
   }
 };
 
-// UPDATE PROFILE
+// ═══ UPDATE PROFILE ═══
 exports.updateProfile = async (req, res) => {
   try {
     const allowed = ['name', 'bio', 'avatar', 'preferences'];
@@ -131,8 +176,7 @@ exports.updateProfile = async (req, res) => {
     });
 
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
-      new: true,
-      runValidators: true
+      new: true, runValidators: true
     });
 
     return ApiResponse.success(res, user.toSafeObject(), 'Profile updated');
@@ -141,7 +185,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// REFRESH TOKEN
+// ═══ REFRESH TOKEN ═══
 exports.refreshToken = async (req, res) => {
   try {
     const token = req.cookies?.refreshToken || req.body?.refreshToken;
@@ -175,12 +219,11 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
-// DELETE ACCOUNT + DATA (GDPR)
+// ═══ DELETE ACCOUNT (GDPR) ═══
 exports.deleteAccount = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Delete all user data
     const MoodEntry = require('../models/MoodEntry');
     const WellnessActivity = require('../models/WellnessActivity');
     const Notification = require('../models/Notification');
@@ -198,15 +241,14 @@ exports.deleteAccount = async (req, res) => {
     res.cookie('refreshToken', '', { maxAge: 0 });
 
     logger.info(`🗑️ Account deleted: ${req.user.email}`);
-
-    return ApiResponse.success(res, null, 'Account and all data deleted permanently');
+    return ApiResponse.success(res, null, 'Account and all data deleted');
   } catch (error) {
-    logger.error(`Delete account error: ${error.message}`);
+    logger.error(`Delete error: ${error.message}`);
     return ApiResponse.error(res, 'Failed to delete account');
   }
 };
 
-// EXPORT DATA (GDPR)
+// ═══ EXPORT DATA (GDPR) ═══
 exports.exportData = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -224,17 +266,11 @@ exports.exportData = async (req, res) => {
       exportDate: new Date().toISOString(),
       user: user.toSafeObject(),
       moodEntries: moods,
-      wellnessActivities: activities,
-      totalMoodEntries: moods.length,
-      totalActivities: activities.length
+      wellnessActivities: activities
     };
 
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=moodecho-data-${Date.now()}.json`
-    );
-
+    res.setHeader('Content-Disposition', `attachment; filename=moodecho-data-${Date.now()}.json`);
     return res.json(exportData);
   } catch (error) {
     return ApiResponse.error(res, 'Export failed');

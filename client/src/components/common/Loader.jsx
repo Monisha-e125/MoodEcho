@@ -1,21 +1,55 @@
 const Loader = ({ fullScreen, text = 'Loading...' }) => {
   const content = (
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-3 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
-      <p className="text-dark-400 text-sm">{text}</p>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '16px',
+      }}
+    >
+      <div
+        style={{
+          width: '40px',
+          height: '40px',
+          border: '3px solid rgba(99, 102, 241, 0.2)',
+          borderTopColor: '#6366f1',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }}
+      />
+      <p style={{ color: '#64748b', fontSize: '14px' }}>{text}</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-dark-950 flex items-center justify-center z-50">
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: '#020617',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+        }}
+      >
         {content}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center py-12">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 0',
+      }}
+    >
       {content}
     </div>
   );

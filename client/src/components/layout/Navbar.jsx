@@ -10,73 +10,119 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const iconBtn = {
+    padding: '8px',
+    borderRadius: '10px',
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
+    color: '#94a3b8',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s',
+  };
+
   return (
     <header
-      className={`
-        fixed top-0 right-0 h-16 bg-dark-900/80 backdrop-blur-md
-        border-b border-dark-800 z-30 flex items-center px-4 lg:px-6
-        transition-all duration-300
-        ${sidebarOpen ? 'left-0 lg:left-64' : 'left-0 lg:left-20'}
-      `}
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        left: sidebarOpen ? '256px' : '72px',
+        height: '64px',
+        backgroundColor: 'rgba(2, 6, 23, 0.8)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #1e293b',
+        zIndex: 30,
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 20px',
+        transition: 'left 0.3s ease',
+      }}
     >
-      {/* Mobile menu button */}
+      {/* Mobile menu */}
       <button
         onClick={() => dispatch(toggleSidebar())}
-        className="p-2 rounded-lg hover:bg-dark-800 text-dark-400 lg:hidden"
+        style={{ ...iconBtn, marginRight: '8px' }}
+        className="lg:hidden"
       >
-        <Menu className="w-5 h-5" />
+        <Menu size={20} />
       </button>
 
       {/* Greeting */}
-      <div className="ml-2 lg:ml-0">
-        <h2 className="text-sm font-medium text-dark-200">
+      <div>
+        <p style={{ fontSize: '14px', fontWeight: '600', color: '#e2e8f0' }}>
           {getGreeting()}, {user?.name?.split(' ')[0] || 'there'} 👋
-        </h2>
+        </p>
       </div>
 
       {/* Right side */}
-      <div className="ml-auto flex items-center gap-2">
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
         {/* Streak */}
         {user?.moodStreak?.current > 0 && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-            <span className="text-sm">🔥</span>
-            <span className="text-xs font-medium text-orange-400">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(249, 115, 22, 0.1)',
+              border: '1px solid rgba(249, 115, 22, 0.2)',
+              marginRight: '8px',
+            }}
+          >
+            <span style={{ fontSize: '14px' }}>🔥</span>
+            <span style={{ fontSize: '12px', fontWeight: '600', color: '#fb923c' }}>
               {user.moodStreak.current} day streak
             </span>
           </div>
         )}
 
-        {/* Notifications */}
-        <button className="p-2 rounded-lg hover:bg-dark-800 text-dark-400 relative">
-          <Bell className="w-5 h-5" />
-        </button>
-
-        {/* Profile */}
         <button
           onClick={() => navigate('/settings')}
-          className="p-2 rounded-lg hover:bg-dark-800 text-dark-400"
+          style={iconBtn}
+          onMouseEnter={(e) => { e.target.style.backgroundColor = '#1e293b'; }}
+          onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
         >
-          <User className="w-5 h-5" />
+          <Bell size={18} />
         </button>
 
-        {/* Logout */}
+        <button
+          onClick={() => navigate('/settings')}
+          style={iconBtn}
+          onMouseEnter={(e) => { e.target.style.backgroundColor = '#1e293b'; }}
+          onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; }}
+        >
+          <User size={18} />
+        </button>
+
         <button
           onClick={() => dispatch(logoutUser())}
-          className="p-2 rounded-lg hover:bg-dark-800 text-dark-400 hover:text-red-400"
           title="Logout"
+          style={iconBtn}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#1e293b';
+            e.target.style.color = '#f87171';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.color = '#94a3b8';
+          }}
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut size={18} />
         </button>
       </div>
     </header>
   );
-};
-
-const getGreeting = () => {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
 };
 
 export default Navbar;

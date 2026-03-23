@@ -17,10 +17,7 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearAuthError();
-    }
+    if (error) { toast.error(error); clearAuthError(); }
   }, [error, clearAuthError]);
 
   const handleChange = (e) => {
@@ -47,49 +44,120 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        background: 'linear-gradient(180deg, #020617 0%, #0f172a 100%)',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '420px' }} className="animate-fade-in">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <span className="text-3xl">🧠</span>
-            <span className="text-2xl font-bold text-white">
-              Mood<span className="text-primary-400">Echo</span>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              textDecoration: 'none',
+            }}
+          >
+            <span style={{ fontSize: '32px' }}>🧠</span>
+            <span style={{ fontSize: '24px', fontWeight: '800', color: '#f1f5f9' }}>
+              Mood<span style={{ color: '#818cf8' }}>Echo</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6">Welcome back</h1>
-          <p className="text-dark-400 mt-1">Login to continue tracking your mood</p>
+          <h1
+            style={{
+              fontSize: '26px',
+              fontWeight: '800',
+              color: '#f1f5f9',
+              marginTop: '28px',
+            }}
+          >
+            Welcome back
+          </h1>
+          <p style={{ color: '#64748b', marginTop: '8px', fontSize: '14px' }}>
+            Login to continue tracking your mood
+          </p>
         </div>
 
-        {/* Form */}
-        <div className="bg-dark-900 border border-dark-800 rounded-2xl p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Email" name="email" type="email"
-              placeholder="you@example.com" icon={Mail}
-              value={formData.email} onChange={handleChange}
-              error={errors.email} required
-            />
-            <Input
-              label="Password" name="password" type="password"
-              placeholder="Enter your password" icon={Lock}
-              value={formData.password} onChange={handleChange}
-              error={errors.password} required
-            />
-            <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-              Login
-            </Button>
+        {/* Card */}
+        <div
+          style={{
+            backgroundColor: '#0f172a',
+            border: '1px solid #1e293b',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                icon={Mail}
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                required
+              />
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                icon={Lock}
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                required
+              />
+              <div style={{ paddingTop: '4px' }}>
+                <Button type="submit" fullWidth isLoading={isLoading} size="lg">
+                  Login
+                </Button>
+              </div>
+            </div>
           </form>
 
-          <p className="text-center text-dark-400 text-sm mt-4">
+          <p
+            style={{
+              textAlign: 'center',
+              color: '#64748b',
+              fontSize: '14px',
+              marginTop: '24px',
+            }}
+          >
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium">
+            <Link
+              to="/register"
+              style={{
+                color: '#818cf8',
+                fontWeight: '600',
+                textDecoration: 'none',
+              }}
+            >
               Sign up
             </Link>
           </p>
         </div>
 
-        <p className="text-center text-xs text-dark-600 mt-4">
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '11px',
+            color: '#475569',
+            marginTop: '24px',
+          }}
+        >
           ⚠️ Not a substitute for professional mental health care.
         </p>
       </div>

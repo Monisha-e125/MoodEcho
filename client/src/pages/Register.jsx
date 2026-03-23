@@ -10,7 +10,10 @@ const Register = () => {
   const navigate = useNavigate();
   const { register, isLoading, error, isAuthenticated, clearAuthError } = useAuth();
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', confirmPassword: ''
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -50,58 +53,137 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <span className="text-3xl">🧠</span>
-            <span className="text-2xl font-bold text-white">
-              Mood<span className="text-primary-400">Echo</span>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        background: 'linear-gradient(180deg, #020617 0%, #0f172a 100%)',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '420px' }} className="animate-fade-in">
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <Link
+            to="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              textDecoration: 'none',
+            }}
+          >
+            <span style={{ fontSize: '32px' }}>🧠</span>
+            <span style={{ fontSize: '24px', fontWeight: '800', color: '#f1f5f9' }}>
+              Mood<span style={{ color: '#818cf8' }}>Echo</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6">Create account</h1>
-          <p className="text-dark-400 mt-1">Start your mental wellness journey</p>
+          <h1
+            style={{
+              fontSize: '26px',
+              fontWeight: '800',
+              color: '#f1f5f9',
+              marginTop: '28px',
+            }}
+          >
+            Create account
+          </h1>
+          <p style={{ color: '#64748b', marginTop: '8px', fontSize: '14px' }}>
+            Start your mental wellness journey
+          </p>
         </div>
 
-        <div className="bg-dark-900 border border-dark-800 rounded-2xl p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Full Name" name="name" placeholder="John Doe"
-              icon={User} value={formData.name} onChange={handleChange}
-              error={errors.name} required
-            />
-            <Input
-              label="Email" name="email" type="email"
-              placeholder="you@example.com" icon={Mail}
-              value={formData.email} onChange={handleChange}
-              error={errors.email} required
-            />
-            <Input
-              label="Password" name="password" type="password"
-              placeholder="Min 6 characters" icon={Lock}
-              value={formData.password} onChange={handleChange}
-              error={errors.password} required
-            />
-            <Input
-              label="Confirm Password" name="confirmPassword" type="password"
-              placeholder="Confirm your password" icon={Lock}
-              value={formData.confirmPassword} onChange={handleChange}
-              error={errors.confirmPassword} required
-            />
-            <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-              Create Account
-            </Button>
+        {/* Card */}
+        <div
+          style={{
+            backgroundColor: '#0f172a',
+            border: '1px solid #1e293b',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <Input
+                label="Full Name"
+                name="name"
+                placeholder="John Doe"
+                icon={User}
+                value={formData.name}
+                onChange={handleChange}
+                error={errors.name}
+                required
+              />
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                icon={Mail}
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                required
+              />
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="Min 6 characters"
+                icon={Lock}
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                required
+              />
+              <Input
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                icon={Lock}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                error={errors.confirmPassword}
+                required
+              />
+              <div style={{ paddingTop: '4px' }}>
+                <Button type="submit" fullWidth isLoading={isLoading} size="lg">
+                  Create Account
+                </Button>
+              </div>
+            </div>
           </form>
 
-          <p className="text-center text-dark-400 text-sm mt-4">
+          <p
+            style={{
+              textAlign: 'center',
+              color: '#64748b',
+              fontSize: '14px',
+              marginTop: '24px',
+            }}
+          >
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium">
+            <Link
+              to="/login"
+              style={{ color: '#818cf8', fontWeight: '600', textDecoration: 'none' }}
+            >
               Login
             </Link>
           </p>
         </div>
 
-        <p className="text-center text-xs text-dark-600 mt-4">
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '11px',
+            color: '#475569',
+            marginTop: '24px',
+          }}
+        >
           ⚠️ Not a substitute for professional mental health care.
         </p>
       </div>

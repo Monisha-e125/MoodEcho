@@ -13,33 +13,73 @@ const CrisisBanner = () => {
 
   return (
     <div
-      className={`
-        fixed top-0 left-0 right-0 z-[100] p-4
-        ${isHigh ? 'bg-red-900/95' : 'bg-amber-900/95'}
-        border-b ${isHigh ? 'border-red-700' : 'border-amber-700'}
-        backdrop-blur-sm animate-slide-up
-      `}
+      className="animate-slide-up"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 200,
+        padding: '16px 20px',
+        backgroundColor: isHigh ? 'rgba(127, 29, 29, 0.95)' : 'rgba(120, 53, 15, 0.95)',
+        borderBottom: isHigh ? '1px solid #991b1b' : '1px solid #92400e',
+        backdropFilter: 'blur(8px)',
+      }}
     >
-      <div className="max-w-4xl mx-auto flex items-start gap-4">
-        <Heart className={`w-6 h-6 mt-0.5 ${isHigh ? 'text-red-300' : 'text-amber-300'} shrink-0`} />
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+        }}
+      >
+        <Heart
+          size={20}
+          style={{
+            color: isHigh ? '#fca5a5' : '#fcd34d',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}
+        />
 
-        <div className="flex-1">
-          <p className="text-white font-medium mb-1">{crisisData.message}</p>
-          <div className="flex flex-wrap gap-3 mt-2">
+        <div style={{ flex: 1 }}>
+          <p style={{ color: '#ffffff', fontWeight: '600', fontSize: '14px' }}>
+            {crisisData.message}
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
             {crisisData.helplines?.slice(0, 3).map((h, i) => (
               <a
                 key={i}
                 href={`tel:${h.number}`}
-                className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg text-sm text-white transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                }}
               >
-                <Phone className="w-3.5 h-3.5" />
+                <Phone size={13} />
                 {h.name}: {h.number}
               </a>
             ))}
           </div>
           <Link
             to="/crisis-help"
-            className="inline-block mt-2 text-sm text-white/80 underline hover:text-white"
+            style={{
+              display: 'inline-block',
+              marginTop: '8px',
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.7)',
+              textDecoration: 'underline',
+            }}
           >
             View all helplines →
           </Link>
@@ -47,9 +87,16 @@ const CrisisBanner = () => {
 
         <button
           onClick={() => dispatch(hideCrisis())}
-          className="p-1 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors"
+          style={{
+            padding: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            color: 'rgba(255,255,255,0.6)',
+            display: 'flex',
+          }}
         >
-          <X className="w-5 h-5" />
+          <X size={18} />
         </button>
       </div>
     </div>

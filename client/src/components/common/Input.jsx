@@ -1,34 +1,80 @@
 const Input = ({
-  label, name, type = 'text', icon: Icon,
-  error, className = '', ...props
+  label,
+  name,
+  type = 'text',
+  icon: Icon,
+  error,
+  className = '',
+  ...props
 }) => {
   return (
-    <div className={className}>
+    <div className={`space-y-2 ${className}`}>
       {label && (
-        <label htmlFor={name} className="block text-sm font-medium text-dark-300 mb-1.5">
+        <label
+          htmlFor={name}
+          className="block text-[13px] font-semibold tracking-wide"
+          style={{ color: '#94a3b8' }}
+        >
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+          <div
+            className="absolute left-0 top-0 bottom-0 flex items-center justify-center pointer-events-none"
+            style={{ width: '44px' }}
+          >
+            <Icon
+              size={16}
+              style={{ color: '#64748b' }}
+            />
+          </div>
         )}
         <input
           id={name}
           name={name}
           type={type}
-          className={`
-            w-full bg-dark-800 border border-dark-700 rounded-xl
-            px-4 py-2.5 text-dark-100 placeholder-dark-500
-            focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500
-            transition-all duration-200
-            ${Icon ? 'pl-10' : ''}
-            ${error ? 'border-red-500' : ''}
-          `}
+          autoComplete={
+            type === 'password'
+              ? 'current-password'
+              : type === 'email'
+                ? 'email'
+                : name === 'name'
+                  ? 'name'
+                  : 'off'
+          }
+          style={{
+            width: '100%',
+            height: '46px',
+            fontSize: '14px',
+            fontWeight: '400',
+            color: '#e2e8f0',
+            backgroundColor: '#0f172a',
+            border: error ? '1.5px solid #ef4444' : '1.5px solid #334155',
+            borderRadius: '12px',
+            paddingLeft: Icon ? '44px' : '16px',
+            paddingRight: '16px',
+            transition: 'all 0.2s ease',
+            outline: 'none',
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = error ? '#ef4444' : '#6366f1';
+            e.target.style.boxShadow = error
+              ? '0 0 0 3px rgba(239,68,68,0.15)'
+              : '0 0 0 3px rgba(99,102,241,0.15)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = error ? '#ef4444' : '#334155';
+            e.target.style.boxShadow = 'none';
+          }}
           {...props}
         />
       </div>
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      {error && (
+        <p style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
+          {error}
+        </p>
+      )}
     </div>
   );
 };
