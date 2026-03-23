@@ -23,8 +23,9 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 // CORS
 const allowedOrigins = [
   'http://localhost:5173',
-  'http://localhost:3001',
-  'https://mood-echo-chi.vercel.app/',
+  'http://localhost:3000',
+  'https://moodecho.vercel.app',
+  'https://mood-echo-chi.vercel.app',
   process.env.CLIENT_URL
 ].filter(Boolean);
 
